@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  flask:
+    build:
+      context: .
+      dockerfile: ./flask/DockerFile
+    container_name: flask_backend_fraud
+    expose:
+      - 8080 # Flask container 서비스 8080으로 노출(컨테이너 끼리 인식 가능하도록)
+    environment:
+      - fraudmodel_ip=172.18.18.04 # serving conatiner ip 주소 환경변수로 추가
+    networks:
+      fraud_backend_test:
+        ipv4_address: 172.10.18.02
+  nginx:
+    build: 
+      context: ./nginx
+      dockerfile: ./DockerFile
+    container_name: nginx_backend_fraud
+    ports:
+      - "5020:5020" # nginx 서비스 5020 port로 연결
+    networks:
+      fraud_backend_test:
+        ipv4_address: 172.10.18.03
+  tensormodel:
+    image: tensorflow/serving:2.1.0-rc1
+    volumes:
+      - ./TensorflowServing:/models/FDSmodel
+    environment:
+      - MODEL_NAME=FDSmodel
+    networks:
+      fraud_backend_test:
+        ipv4_address: 172.10.18.04
+networks:
+  fraud_backend_test:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.10.18.0/24
