@@ -19,7 +19,7 @@ services:
       dockerfile: ./DockerFile
     container_name: nginx_backend_fraud
     ports:
-      - "5020:5020" # nginx 서비스 5020 port로 연결
+      - "5000:5000" # nginx 서비스 5000 port로 연결
     networks:
       fraud_backend_test:
         ipv4_address: 172.10.18.03
